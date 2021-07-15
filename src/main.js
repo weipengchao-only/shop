@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
-
+import TreeTable from 'vue-table-with-tree-grid'
 
 
 import axios from 'axios'
@@ -15,7 +15,7 @@ axios.interceptors.request.use(config => {
 })
 Vue.prototype.$http = axios//把包挂载到vue的原型对象上
 Vue.config.productionTip = false
-
+Vue.component('tree-table', TreeTable)
 new Vue({
   router,
   render: h => h(App)
