@@ -32,7 +32,7 @@
 						<el-table-column type="expand">
 							<template slot-scope="scope">
 								<!-- 循环渲染tag标签 -->
-								<el-tag v-for="(item,index) in scope.row.attr_vals" :key="index" closable>{{item}}</el-tag>
+								<el-tag v-for="(item,index) in scope.row.attr_vals" :key="index" closable @close="closeTag(index,scope.row)">{{item}}</el-tag>
 								<!-- 输入的文本框 -->
 								<el-input
 								  class="input-new-tag"
@@ -65,7 +65,25 @@
 					<!-- 静态参数的表格 -->
 					<el-table :data="onlyTableData" border stripe>
 						<!-- 展开行 -->
-						<el-table-column type="expand"></el-table-column>
+						<el-table-column type="expand">
+							<template slot-scope="scope">
+								<!-- 循环渲染tag标签 -->
+								<el-tag v-for="(item,index) in scope.row.attr_vals" :key="index" closable @close="closeTag(index,scope.row)">{{item}}</el-tag>
+								<!-- 输入的文本框 -->
+								<el-input
+								  class="input-new-tag"
+								  v-if="scope.row.inputVisible"
+								  v-model="scope.row.inputValue"
+								  ref="saveTagInput"
+								  size="small"
+								  @keyup.enter.native="handleInputConfirm(scope.row)"
+								  @blur="handleInputConfirm(scope.row)"
+								>
+								<!-- 添加按钮 -->
+								</el-input>
+								<el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>
+							</template>
+						</el-table-column>
 						<!-- 索引列 -->
 						<el-table-column type="index"></el-table-column>
 						<el-table-column label="属性名称" prop="attr_name"></el-table-column>
@@ -176,6 +194,8 @@
 				//证明选中的不是三级分类
 				if (this.selectedKeys.length !== 3) {
 					this.selectedKeys = []
+					this.manyTableData = []
+					this.onlyTableData = []
 					return
 				}
 				const {
@@ -291,14 +311,32 @@
 						this.getParamsData()
 		},
 		//文本框失去焦点或按下enter触发的事件
-		handleInputConfirm(row){
+		async handleInputConfirm(row){
 			//如果输入框输入内容为空，则清空输入框，trim()清空字符串中的空格
 			if (row.inputValue.trim().length === 0) {
 				row.inputValue = ''
 				row.inputVisible = false
 				return
 			} else{
-				
+				//如果没有return出去，说明数据内容输入正确，需要对内容做后续处理
+				row.attr_vals.push(row.inputValue.trim())
+				row.inputValue=''
+				row.inputVisible = false
+				this.saveAttrvals(row)
+			}
+		},
+		//发起请求保存输入tag的数据到数据库
+		async saveAttrvals(row){
+			//需要发起请求，将数据保存到数据库中
+			const {data : result} = await this.$http.put(`categories/${this.cateId}/attributes/${row.attr_id}`,{
+				attr_name : row.attr_name,
+				attr_sel : row.attr_sel,
+				attr_vals : row.attr_vals.join(' ')
+			})
+			if (result.meta.status !== 200) {
+				return this.$message.error('添加参数项失败')
+			} else{
+				return this.$message.success('修改参数项成功')
 			}
 		},
 		//点击按钮展示文本输入框
@@ -308,6 +346,11 @@
 			this.$nextTick(_ => {
 			          this.$refs.saveTagInput.$refs.input.focus();
 			        });
+		},
+		//监听tag标签的删除事件
+		closeTag(index,row){
+			row.attr_vals.splice(index,1)
+			this.saveAttrvals(row)
 		}
 		},
 		//如果添加按钮需要被禁用则返回true,否则返回false
