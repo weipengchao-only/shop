@@ -29,6 +29,7 @@ const routes = [
 		{path:'/params',component:Params},
 		{path:'/goods',component:List},
 		{path:'/goods/add',component:Add}
+		
 	]}
 	
   
