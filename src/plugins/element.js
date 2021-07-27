@@ -34,7 +34,12 @@ import {
 	Tabs,
 	TabPane,
 	Steps,
-	Step
+	Step,
+	Checkbox,
+	CheckboxGroup,
+	Upload,
+	Timeline,
+	TimelineItem
 	
 	
 	} from 'element-ui'
@@ -74,5 +79,10 @@ Vue.use(Tabs)
 Vue.use(TabPane)
 Vue.use(Steps)
 Vue.use(Step)
+Vue.use(Checkbox)
+Vue.use(CheckboxGroup)
+Vue.use(Upload)
+Vue.use(Timeline)
+Vue.use(TimelineItem)
 Vue.prototype.$message = Message //把message组件挂载到vue的原型对象上，这样每个组件都可以通过this访问到$message,以此使用Message组件
 Vue.prototype.$confirm = MessageBox.confirm
