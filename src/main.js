@@ -12,7 +12,7 @@ import 'quill/dist/quill.bubble.css' // for bubble theme
 
 import axios from 'axios'
 //配置请求路径
-axios.defaults.baseURL = 'http://timemeetyou.com:8889/api/private/v1/'
+axios.defaults.baseURL = 'https://www.liulongbin.top:8888/api/private/v1/'
 //添加设置请求拦截器，为请求头（config.headers）中的Authorization属性设置token值，确定访问权限
 axios.interceptors.request.use(config => {
 	config.headers.Authorization = window.sessionStorage.getItem('token')
